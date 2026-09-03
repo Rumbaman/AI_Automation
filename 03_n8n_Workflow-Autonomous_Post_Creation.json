@@ -1,0 +1,3623 @@
+{
+  "name": "Autonomous Post Creation",
+  "nodes": [
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyX",
+              "value": 5,
+              "unit": "minutes"
+            }
+          ]
+        },
+        "authentication": "airtableOAuth2Api",
+        "baseId": {
+          "__rl": true,
+          "value": "https://airtable.com/app9ayaylrWBYzGgl/tblABB89KZ7h87UjC/viwb7Y5i0UCur2iGI",
+          "mode": "url"
+        },
+        "tableId": {
+          "__rl": true,
+          "value": "https://airtable.com/app9ayaylrWBYzGgl/tblABB89KZ7h87UjC/viwb7Y5i0UCur2iGI?blocks=hide",
+          "mode": "url"
+        },
+        "triggerField": "Created On",
+        "additionalFields": {
+          "formula": "{State} = \"Pending\" AND {Seed Idea} != \"\" AND {Comments For Review} = \"\""
+        }
+      },
+      "type": "n8n-nodes-base.airtableTrigger",
+      "typeVersion": 1,
+      "position": [
+        -1968,
+        -64
+      ],
+      "id": "e38a3f4d-702d-4f4f-bd07-f02862cca620",
+      "name": "Airtable Trigger",
+      "alwaysOutputData": true,
+      "retryOnFail": false,
+      "waitBetweenTries": 3000,
+      "credentials": {
+        "airtableOAuth2Api": {
+          "id": "kLFMZzm9v88LLSZb",
+          "name": "Airtable account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ item.$json.chatInput }}",
+        "messages": {
+          "messageValues": []
+        },
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.9,
+      "position": [
+        -1168,
+        -64
+      ],
+      "id": "5ec78914-81fc-4e52-8c06-dcc851ea0768",
+      "name": "Basic LLM Chain",
+      "retryOnFail": true,
+      "waitBetweenTries": 3000,
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "model": "deepseek-v4-flash",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatDeepSeek",
+      "typeVersion": 1,
+      "position": [
+        -1168,
+        96
+      ],
+      "id": "9cb815ed-32e2-4c6a-8752-1aa2b76a9b1a",
+      "name": "DeepSeek Chat Model",
+      "credentials": {
+        "deepSeekApi": {
+          "id": "q5MoPc9dIWtXwuud",
+          "name": "DeepSeek account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "airtableOAuth2Api",
+        "operation": "update",
+        "base": {
+          "__rl": true,
+          "value": "app9ayaylrWBYzGgl",
+          "mode": "list",
+          "cachedResultName": "Content Pipeline",
+          "cachedResultUrl": "https://airtable.com/app9ayaylrWBYzGgl"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblABB89KZ7h87UjC",
+          "mode": "list",
+          "cachedResultName": "Post Ideas",
+          "cachedResultUrl": "https://airtable.com/app9ayaylrWBYzGgl/tblABB89KZ7h87UjC"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "id": "={{ $('Airtable Trigger').item.json.id }}",
+            "State": "Processed By AI"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": false
+            },
+            {
+              "id": "ID",
+              "displayName": "ID",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "Seed Idea",
+              "displayName": "Seed Idea",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Context",
+              "displayName": "Context",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "State",
+              "displayName": "State",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "Pending",
+                  "value": "Pending"
+                },
+                {
+                  "name": "Generating",
+                  "value": "Generating"
+                },
+                {
+                  "name": "Processed By AI",
+                  "value": "Processed By AI"
+                },
+                {
+                  "name": "Pending Approval",
+                  "value": "Pending Approval"
+                },
+                {
+                  "name": "Approved By Human",
+                  "value": "Approved By Human"
+                },
+                {
+                  "name": "Published",
+                  "value": "Published"
+                }
+              ],
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "AI Draft",
+              "displayName": "AI Draft",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Approved",
+              "displayName": "Approved",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "boolean",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Comments For Review",
+              "displayName": "Comments For Review",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Human Reviewer",
+              "displayName": "Human Reviewer",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Created On",
+              "displayName": "Created On",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "Updated On",
+              "displayName": "Updated On",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "Published On",
+              "displayName": "Published On",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "dateTime",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "LinkedIn URL",
+              "displayName": "LinkedIn URL",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Content Category",
+              "displayName": "Content Category",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "Tips",
+                  "value": "Tips"
+                },
+                {
+                  "name": "How-To",
+                  "value": "How-To"
+                },
+                {
+                  "name": "Case Study",
+                  "value": "Case Study"
+                },
+                {
+                  "name": "Industry News",
+                  "value": "Industry News"
+                },
+                {
+                  "name": "Opinion",
+                  "value": "Opinion"
+                },
+                {
+                  "name": "Announcement",
+                  "value": "Announcement"
+                },
+                {
+                  "name": "Other",
+                  "value": "Other"
+                }
+              ],
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Hashtags",
+              "displayName": "Hashtags",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Error Log",
+              "displayName": "Error Log",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.2,
+      "position": [
+        -576,
+        -160
+      ],
+      "id": "f08837a3-1d0e-4ec9-ae04-ed0352e2975b",
+      "name": "Update State = Processed By AI",
+      "alwaysOutputData": true,
+      "credentials": {
+        "airtableOAuth2Api": {
+          "id": "kLFMZzm9v88LLSZb",
+          "name": "Airtable account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "sendAndWait",
+        "select": "channel",
+        "channelId": {
+          "__rl": true,
+          "value": "#ai_post_review",
+          "mode": "name"
+        },
+        "message": "=Here is the new post and it's ready for your review.\n\n{{ $('Basic LLM Chain').item.json.text }}\n\n==================\n\nPlease click on \"Respond\" button.\n\nReply \"OK\" if you approve the post.\nOtherwise, provide a feedback.",
+        "responseType": "freeText",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.7,
+      "position": [
+        -368,
+        -160
+      ],
+      "id": "3087a93d-96e3-4fd5-9687-983c55794931",
+      "name": "HITL - Send Post For Human Approval",
+      "webhookId": "eb8f7e33-ea30-483d-95e8-ce8ca1931b33",
+      "alwaysOutputData": false,
+      "credentials": {
+        "slackApi": {
+          "id": "ujprwomEONW5cvqv",
+          "name": "Slack account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "airtableOAuth2Api",
+        "operation": "update",
+        "base": {
+          "__rl": true,
+          "value": "app9ayaylrWBYzGgl",
+          "mode": "list",
+          "cachedResultName": "Content Pipeline",
+          "cachedResultUrl": "https://airtable.com/app9ayaylrWBYzGgl"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblABB89KZ7h87UjC",
+          "mode": "list",
+          "cachedResultName": "Post Ideas",
+          "cachedResultUrl": "https://airtable.com/app9ayaylrWBYzGgl/tblABB89KZ7h87UjC"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Approved": true,
+            "State": "Approved By Human",
+            "id": "={{ $('Airtable Trigger').item.json.id }}",
+            "AI Draft": "={{ $('Basic LLM Chain').item.json.text }}"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": false
+            },
+            {
+              "id": "ID",
+              "displayName": "ID",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "Seed Idea",
+              "displayName": "Seed Idea",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Context",
+              "displayName": "Context",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "State",
+              "displayName": "State",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "Pending",
+                  "value": "Pending"
+                },
+                {
+                  "name": "Generating",
+                  "value": "Generating"
+                },
+                {
+                  "name": "Processed By AI",
+                  "value": "Processed By AI"
+                },
+                {
+                  "name": "Pending Approval",
+                  "value": "Pending Approval"
+                },
+                {
+                  "name": "Approved By Human",
+                  "value": "Approved By Human"
+                },
+                {
+                  "name": "Published",
+                  "value": "Published"
+                }
+              ],
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "AI Draft",
+              "displayName": "AI Draft",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Approved",
+              "displayName": "Approved",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "boolean",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Comments For Review",
+              "displayName": "Comments For Review",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Human Reviewer",
+              "displayName": "Human Reviewer",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Created On",
+              "displayName": "Created On",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "Updated On",
+              "displayName": "Updated On",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "Published On",
+              "displayName": "Published On",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "dateTime",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "LinkedIn URL",
+              "displayName": "LinkedIn URL",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Content Category",
+              "displayName": "Content Category",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "Tips",
+                  "value": "Tips"
+                },
+                {
+                  "name": "How-To",
+                  "value": "How-To"
+                },
+                {
+                  "name": "Case Study",
+                  "value": "Case Study"
+                },
+                {
+                  "name": "Industry News",
+                  "value": "Industry News"
+                },
+                {
+                  "name": "Opinion",
+                  "value": "Opinion"
+                },
+                {
+                  "name": "Announcement",
+                  "value": "Announcement"
+                },
+                {
+                  "name": "Other",
+                  "value": "Other"
+                }
+              ],
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Hashtags",
+              "displayName": "Hashtags",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Error Log",
+              "displayName": "Error Log",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.2,
+      "position": [
+        336,
+        -176
+      ],
+      "id": "abf203ff-12a5-4053-beb1-b29902b59947",
+      "name": "Update State = Approved & Approved By Human = True",
+      "credentials": {
+        "airtableOAuth2Api": {
+          "id": "kLFMZzm9v88LLSZb",
+          "name": "Airtable account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "select": "channel",
+        "channelId": {
+          "__rl": true,
+          "value": "#social",
+          "mode": "name"
+        },
+        "text": "={{ $json.fields['AI Draft'] }}",
+        "otherOptions": {
+          "includeLinkToWorkflow": false
+        }
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.7,
+      "position": [
+        544,
+        -176
+      ],
+      "id": "84e0a517-9c7a-4f44-85f9-50959457a68f",
+      "name": "Publish Post",
+      "webhookId": "9dcfa681-76cb-45ab-81ce-21f2b2cc5c44",
+      "credentials": {
+        "slackApi": {
+          "id": "ujprwomEONW5cvqv",
+          "name": "Slack account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "airtableOAuth2Api",
+        "operation": "update",
+        "base": {
+          "__rl": true,
+          "value": "app9ayaylrWBYzGgl",
+          "mode": "list",
+          "cachedResultName": "Content Pipeline",
+          "cachedResultUrl": "https://airtable.com/app9ayaylrWBYzGgl"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblABB89KZ7h87UjC",
+          "mode": "list",
+          "cachedResultName": "Post Ideas",
+          "cachedResultUrl": "https://airtable.com/app9ayaylrWBYzGgl/tblABB89KZ7h87UjC"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "id": "={{ $('Airtable Trigger').item.json.id }}",
+            "State": "Published",
+            "Published On": "={{ $now }}"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": false
+            },
+            {
+              "id": "ID",
+              "displayName": "ID",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "Seed Idea",
+              "displayName": "Seed Idea",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Context",
+              "displayName": "Context",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "State",
+              "displayName": "State",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "Pending",
+                  "value": "Pending"
+                },
+                {
+                  "name": "Generating",
+                  "value": "Generating"
+                },
+                {
+                  "name": "Processed By AI",
+                  "value": "Processed By AI"
+                },
+                {
+                  "name": "Pending Approval",
+                  "value": "Pending Approval"
+                },
+                {
+                  "name": "Approved By Human",
+                  "value": "Approved By Human"
+                },
+                {
+                  "name": "Published",
+                  "value": "Published"
+                }
+              ],
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "AI Draft",
+              "displayName": "AI Draft",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Approved",
+              "displayName": "Approved",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "boolean",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Comments For Review",
+              "displayName": "Comments For Review",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Human Reviewer",
+              "displayName": "Human Reviewer",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Created On",
+              "displayName": "Created On",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "Updated On",
+              "displayName": "Updated On",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "Published On",
+              "displayName": "Published On",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "dateTime",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "LinkedIn URL",
+              "displayName": "LinkedIn URL",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Content Category",
+              "displayName": "Content Category",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "Tips",
+                  "value": "Tips"
+                },
+                {
+                  "name": "How-To",
+                  "value": "How-To"
+                },
+                {
+                  "name": "Case Study",
+                  "value": "Case Study"
+                },
+                {
+                  "name": "Industry News",
+                  "value": "Industry News"
+                },
+                {
+                  "name": "Opinion",
+                  "value": "Opinion"
+                },
+                {
+                  "name": "Announcement",
+                  "value": "Announcement"
+                },
+                {
+                  "name": "Other",
+                  "value": "Other"
+                }
+              ],
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Hashtags",
+              "displayName": "Hashtags",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Error Log",
+              "displayName": "Error Log",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.2,
+      "position": [
+        960,
+        -176
+      ],
+      "id": "a01a9d8a-4848-4ca6-8e6c-1f7fc2ea0fcd",
+      "name": "Update State = Published",
+      "credentials": {
+        "airtableOAuth2Api": {
+          "id": "kLFMZzm9v88LLSZb",
+          "name": "Airtable account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "select": "channel",
+        "channelId": {
+          "__rl": true,
+          "value": "#ai_automation_support",
+          "mode": "name"
+        },
+        "text": "=An error has ocurred:\n\nWorkflow Name: {{ $workflow.name }}\n\nError Message: {{ $json.fields['Error Log'] }}\n\nTimestamp: {{ $json.fields['Updated On'] }}\n\nFlow Run ID: {{ $json.id }}",
+        "otherOptions": {
+          "includeLinkToWorkflow": false
+        }
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.7,
+      "position": [
+        -368,
+        32
+      ],
+      "id": "cf4ffd4e-9ccf-4e49-8d9d-f5521e5648e9",
+      "name": "Error - Send Message To Support Team",
+      "webhookId": "8f406c19-1b0f-4cd6-9011-67dbdfade4e7",
+      "credentials": {
+        "slackApi": {
+          "id": "ujprwomEONW5cvqv",
+          "name": "Slack account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "9ab2511c-e95c-4523-939a-ad406af834f4",
+              "leftValue": "={{ $('Airtable Trigger').item.json.fields.State }}",
+              "rightValue": "Pending",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            },
+            {
+              "id": "c55c9fff-cec6-4157-8292-10c006131813",
+              "leftValue": "={{ $('Airtable Trigger').item.json.fields['Seed Idea'] }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.3,
+      "position": [
+        -1568,
+        -64
+      ],
+      "id": "bc1214a0-d578-4ef7-96d7-d875bd6e90d9",
+      "name": "Filter"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "4b379ea0-4058-4baa-afc6-f76fbe0acc52",
+              "leftValue": "={{ $json.data.text.toUpperCase().trim() }}",
+              "rightValue": "OK",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -176,
+        -160
+      ],
+      "id": "f96fb905-e24d-41c0-bb52-901583969613",
+      "name": "IF - Approved By Human Reviewer?"
+    },
+    {
+      "parameters": {
+        "authentication": "airtableOAuth2Api",
+        "operation": "update",
+        "base": {
+          "__rl": true,
+          "value": "app9ayaylrWBYzGgl",
+          "mode": "list",
+          "cachedResultName": "Content Pipeline",
+          "cachedResultUrl": "https://airtable.com/app9ayaylrWBYzGgl"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblABB89KZ7h87UjC",
+          "mode": "list",
+          "cachedResultName": "Post Ideas",
+          "cachedResultUrl": "https://airtable.com/app9ayaylrWBYzGgl/tblABB89KZ7h87UjC"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "id": "={{ $('Airtable Trigger').item.json.id }}",
+            "State": "Generating",
+            "Comments For Review": "={{ $json.fields['Reviewer Feedback'] }}"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": false
+            },
+            {
+              "id": "ID",
+              "displayName": "ID",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "Seed Idea",
+              "displayName": "Seed Idea",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Context",
+              "displayName": "Context",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "State",
+              "displayName": "State",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "Pending",
+                  "value": "Pending"
+                },
+                {
+                  "name": "Generating",
+                  "value": "Generating"
+                },
+                {
+                  "name": "Processed By AI",
+                  "value": "Processed By AI"
+                },
+                {
+                  "name": "Pending Approval",
+                  "value": "Pending Approval"
+                },
+                {
+                  "name": "Approved By Human",
+                  "value": "Approved By Human"
+                },
+                {
+                  "name": "Published",
+                  "value": "Published"
+                }
+              ],
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "AI Draft",
+              "displayName": "AI Draft",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Approved",
+              "displayName": "Approved",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "boolean",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Comments For Review",
+              "displayName": "Comments For Review",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Human Reviewer",
+              "displayName": "Human Reviewer",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Created On",
+              "displayName": "Created On",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "Updated On",
+              "displayName": "Updated On",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "Published On",
+              "displayName": "Published On",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "dateTime",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "LinkedIn URL",
+              "displayName": "LinkedIn URL",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Content Category",
+              "displayName": "Content Category",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "Tips",
+                  "value": "Tips"
+                },
+                {
+                  "name": "How-To",
+                  "value": "How-To"
+                },
+                {
+                  "name": "Case Study",
+                  "value": "Case Study"
+                },
+                {
+                  "name": "Industry News",
+                  "value": "Industry News"
+                },
+                {
+                  "name": "Opinion",
+                  "value": "Opinion"
+                },
+                {
+                  "name": "Announcement",
+                  "value": "Announcement"
+                },
+                {
+                  "name": "Other",
+                  "value": "Other"
+                }
+              ],
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Hashtags",
+              "displayName": "Hashtags",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Error Log",
+              "displayName": "Error Log",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.2,
+      "position": [
+        336,
+        80
+      ],
+      "id": "190ab991-6c1d-41bf-b82f-a6854a18361a",
+      "name": "Update State = Generating & Comments For Review",
+      "credentials": {
+        "airtableOAuth2Api": {
+          "id": "kLFMZzm9v88LLSZb",
+          "name": "Airtable account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "select": "channel",
+        "channelId": {
+          "__rl": true,
+          "value": "#ai_post_review",
+          "mode": "name"
+        },
+        "text": "=The post you approved has been published!\nPlease check it out at \"#social\" channel.",
+        "otherOptions": {
+          "includeLinkToWorkflow": false
+        }
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.7,
+      "position": [
+        1152,
+        -176
+      ],
+      "id": "a88f5dce-2f32-422a-979e-2da7a19049e1",
+      "name": "Send Message Of Post Published",
+      "webhookId": "4c41f5d0-4df9-4f4b-a88a-8b2234eeaeff",
+      "credentials": {
+        "slackApi": {
+          "id": "ujprwomEONW5cvqv",
+          "name": "Slack account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "airtableOAuth2Api",
+        "operation": "update",
+        "base": {
+          "__rl": true,
+          "value": "app9ayaylrWBYzGgl",
+          "mode": "list",
+          "cachedResultName": "Content Pipeline",
+          "cachedResultUrl": "https://airtable.com/app9ayaylrWBYzGgl"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblABB89KZ7h87UjC",
+          "mode": "list",
+          "cachedResultName": "Post Ideas",
+          "cachedResultUrl": "https://airtable.com/app9ayaylrWBYzGgl/tblABB89KZ7h87UjC"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "id": "={{ $('Airtable Trigger').item.json.id }}",
+            "State": "Error",
+            "Error Log": "={{ $json.fields['Error Message'] }}"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": false
+            },
+            {
+              "id": "ID",
+              "displayName": "ID",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "Seed Idea",
+              "displayName": "Seed Idea",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Context",
+              "displayName": "Context",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "State",
+              "displayName": "State",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "Pending",
+                  "value": "Pending"
+                },
+                {
+                  "name": "Generating",
+                  "value": "Generating"
+                },
+                {
+                  "name": "Processed By AI",
+                  "value": "Processed By AI"
+                },
+                {
+                  "name": "Pending Approval",
+                  "value": "Pending Approval"
+                },
+                {
+                  "name": "Approved By Human",
+                  "value": "Approved By Human"
+                },
+                {
+                  "name": "Published",
+                  "value": "Published"
+                },
+                {
+                  "name": "Error",
+                  "value": "Error"
+                }
+              ],
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "AI Draft",
+              "displayName": "AI Draft",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Approved",
+              "displayName": "Approved",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "boolean",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Comments For Review",
+              "displayName": "Comments For Review",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Created On",
+              "displayName": "Created On",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "Updated On",
+              "displayName": "Updated On",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "Published On",
+              "displayName": "Published On",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "dateTime",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Error Log",
+              "displayName": "Error Log",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.2,
+      "position": [
+        -576,
+        32
+      ],
+      "id": "b3eaa87d-8a51-4004-be4d-329f700bab63",
+      "name": "Update State = Error & Log Error Message",
+      "credentials": {
+        "airtableOAuth2Api": {
+          "id": "kLFMZzm9v88LLSZb",
+          "name": "Airtable account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "63b1fde2-f9ea-431b-9cfc-ad9afa18a589",
+              "name": "chatInput",
+              "value": "=Act as a Senior Technical Trainer and Content Strategist with 15 years of experience in instructional design. Your specialty is translating complex, niche topics into digestible, actionable 60-second reads for busy professionals.\n\nGenerate a short, practical educational post based on the Seed Idea, Context, and Content Category provided below. The post must teach the reader one specific, actionable skill or mental model they can use today.\n\nSeed Idea: {{ $('Airtable Trigger').item.json.fields['Seed Idea'] }}\n\nContext: {{ $('Airtable Trigger').item.json.fields.Context }}\n\nReviewer Feedback: \n\nCONDITIONAL INSTRUCTION:\n- IF \"Reviewer Feedback\" is empty or contains only whitespace: Generate a new post from scratch based solely on the \"Seed Idea\" and \"Context\".\n- IF \"Reviewer Feedback\" contains any text: Treat this as a revision request. Carefully read and analyze the feedback. Apply every actionable point to regenerate the post while maintaining the original \"Seed Idea\" and \"Context\".\n\nREVISION INSTRUCTIONS (only apply if \"Reviewer Feedback\" is not empty):\n- Carefully read and analyze the \"Reviewer Feedback\" provided above.\n- Identify all specific change requests, critiques, and suggestions mentioned.\n- Apply every actionable piece of feedback to the regenerated post.\n- If feedback is vague or contradictory, prioritize the most recent or most specific comment.\n- Do not ignore, dismiss, or \"work around\" any feedback—treat it as mandatory.\n- Maintain the original \"Seed Idea\" and \"Context\" unless the feedback explicitly requests a change.\n- If feedback requests a change that contradicts the \"Seed Idea\", note this in the output and default to the \"Seed Idea\".\n\nSTRICT CONSTRAINTS AND SAFEGUARDS:\n1. Stick to the Seed. Extract every claim, framework, and step directly from the \"Seed Idea\" provided. Do not invent external case studies, statistics, testimonials, or research unless explicitly stated in the \"Context\".\n2. No fluff. Eliminate generic advice like \"stay positive\" or \"work hard.\" Every sentence must serve a mechanical or logical purpose related to the \"Seed Idea\".\n3. Source Attribution. If the \"Seed Idea\" implies a known author or book, mention it only if contextually necessary. If the \"Seed Idea\" is original, do not attribute it to a fictitious expert.\n4. Fact-Check Gate. If the \"Seed Idea\" lacks a specific number, step, or metric, do not guess. Use a placeholder like \"set the timer that you feel is most comfortable to you\" or reframe the sentence to avoid the missing data.\n5. Tone. Professional, authoritative, and conversational. No marketing hype. Avoid words like \"game-changing\" or \"revolutionary\" unless the \"Seed Idea\" uses them exactly.\n6. Feedback Integration (if applicable). Every point in the \"Reviewer Feedback\" must be addressed in the regenerated post. If a point cannot be addressed, explicitly state why in a brief note after the post.\n\nUNICODE BOLD FORMATTING RULES:\n- Apply Unicode bold characters to the following elements ONLY:\n  - Headline (full headline in bold)\n  - The first 1-2 words of each bullet point in the Core Framework (the \"action verb\" or \"key term\")\n  - The Actionable Takeaway (full sentence in bold)\n- Do NOT bold entire paragraphs or more than 3-4 words per bullet point. Overuse reduces visual impact.\n- Use these Unicode bold characters for letters: 𝗔 𝗕 𝗖 𝗗 𝗘 𝗙 𝗚 𝗛 𝗜 𝗝 𝗞 𝗟 𝗠 𝗡 𝗢 𝗣 𝗤 𝗥 𝗦 𝗧 𝗨 𝗩 𝗪 𝗫 𝗬 𝗭\n- Use these for numbers: 𝟬 𝟭 𝟮 𝟯 𝟰 𝟱 𝟲 𝟳 𝟴 𝟵\n- Use these for punctuation: include commas and periods within bolded sections.\n- For apostrophes and quotes, use standard ASCII characters (they convert automatically in Unicode bold context).\n- All other text (body copy, CTAs, hashtags) remains in standard plain text.\n\nOUTPUT STRUCTURE - VISUAL POST:\n- Headline (Hook): Bolded entirely. Max 10 words.\n- The Problem (1 sentence): Plain text.\n- The Core Framework (3 bullet points): Each bullet starts with 1-2 bolded words (the action verb or key term), followed by plain text explanation.\n- The Actionable Takeaway (1 sentence): Bolded entirely.\n- Call to Action: Plain text.\n- Related Hashtags: Plain text. Maximum 5. Mix broad and niche tags. No spaces or special characters. Format as a single line separated by spaces.\n\nREVISION SUMMARY (ONLY include if \"Reviewer Feedback\" is not empty):\nAfter the visual post, include a brief summary of the changes made based on feedback. This helps the reviewer confirm their feedback was incorporated.\n\nGENERATION NOTE (ONLY include if \"Reviewer Feedback\" is empty):\nDo not include any revision summary or feedback notes. Output only the visual post.\n\nSeed Idea: {{ $('Airtable Trigger').item.json.fields['Seed Idea'] }}\n\nContext: {{ $('Airtable Trigger').item.json.fields.Context }}",
+              "type": "string"
+            },
+            {
+              "id": "9bd9d2f4-6623-4f92-96e8-1f03343cdb72",
+              "name": "fields['Seed Idea']",
+              "value": "={{ $('Airtable Trigger').item.json.fields['Seed Idea'] }}",
+              "type": "string"
+            },
+            {
+              "id": "5826048d-30da-4fc8-b04d-bb6ab5031d79",
+              "name": "fields.Context",
+              "value": "={{ $('Airtable Trigger').item.json.fields.Context }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        -1376,
+        -64
+      ],
+      "id": "48bd804a-0681-43fe-82c5-4e29896d15ea",
+      "name": "Prepare For AI Node"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "93dcf8f1-f389-4906-8679-0f9f6339dbf9",
+              "name": "chatInput",
+              "value": "=Act as a Senior Technical Trainer and Content Strategist with 15 years of experience in instructional design. Your specialty is translating complex, niche topics into digestible, actionable 60-second reads for busy professionals.\n\nGenerate a short, practical educational post based on the Seed Idea, Context, and Content Category provided below. The post must teach the reader one specific, actionable skill or mental model they can use today.\n\nSeed Idea: {{ $('Airtable Trigger').item.json.fields['Seed Idea'] }}\n\nContext: {{ $('Airtable Trigger').item.json.fields.Context }}\n\nReviewer Feedback: {{ $json.fields['Comments For Review'] }}\n\nCONDITIONAL INSTRUCTION:\n- IF \"Reviewer Feedback\" is empty or contains only whitespace: Generate a new post from scratch based solely on the \"Seed Idea\" and \"Context\".\n- IF \"Reviewer Feedback\" contains any text: Treat this as a revision request. Carefully read and analyze the feedback. Apply every actionable point to regenerate the post while maintaining the original \"Seed Idea\" and \"Context\".\n\nREVISION INSTRUCTIONS (only apply if \"Reviewer Feedback\" is not empty):\n- Carefully read and analyze the \"Reviewer Feedback\" provided above.\n- Identify all specific change requests, critiques, and suggestions mentioned.\n- Apply every actionable piece of feedback to the regenerated post.\n- If feedback is vague or contradictory, prioritize the most recent or most specific comment.\n- Do not ignore, dismiss, or \"work around\" any feedback—treat it as mandatory.\n- Maintain the original \"Seed Idea\" and \"Context\" unless the feedback explicitly requests a change.\n- If feedback requests a change that contradicts the \"Seed Idea\", note this in the output and default to the \"Seed Idea\".\n\nSTRICT CONSTRAINTS AND SAFEGUARDS:\n1. Stick to the Seed. Extract every claim, framework, and step directly from the \"Seed Idea\" provided. Do not invent external case studies, statistics, testimonials, or research unless explicitly stated in the \"Context\".\n2. No fluff. Eliminate generic advice like \"stay positive\" or \"work hard.\" Every sentence must serve a mechanical or logical purpose related to the \"Seed Idea\".\n3. Source Attribution. If the \"Seed Idea\" implies a known author or book, mention it only if contextually necessary. If the \"Seed Idea\" is original, do not attribute it to a fictitious expert.\n4. Fact-Check Gate. If the \"Seed Idea\" lacks a specific number, step, or metric, do not guess. Use a placeholder like \"set the timer that you feel is most comfortable to you\" or reframe the sentence to avoid the missing data.\n5. Tone. Professional, authoritative, and conversational. No marketing hype. Avoid words like \"game-changing\" or \"revolutionary\" unless the \"Seed Idea\" uses them exactly.\n6. Feedback Integration (if applicable). Every point in the \"Reviewer Feedback\" must be addressed in the regenerated post. If a point cannot be addressed, explicitly state why in a brief note after the post.\n\nUNICODE BOLD FORMATTING RULES:\n- Apply Unicode bold characters to the following elements ONLY:\n  - Headline (full headline in bold)\n  - The first 1-2 words of each bullet point in the Core Framework (the \"action verb\" or \"key term\")\n  - The Actionable Takeaway (full sentence in bold)\n- Do NOT bold entire paragraphs or more than 3-4 words per bullet point. Overuse reduces visual impact.\n- Use these Unicode bold characters for letters: 𝗔 𝗕 𝗖 𝗗 𝗘 𝗙 𝗚 𝗛 𝗜 𝗝 𝗞 𝗟 𝗠 𝗡 𝗢 𝗣 𝗤 𝗥 𝗦 𝗧 𝗨 𝗩 𝗪 𝗫 𝗬 𝗭\n- Use these for numbers: 𝟬 𝟭 𝟮 𝟯 𝟰 𝟱 𝟲 𝟳 𝟴 𝟵\n- Use these for punctuation: include commas and periods within bolded sections.\n- For apostrophes and quotes, use standard ASCII characters (they convert automatically in Unicode bold context).\n- All other text (body copy, CTAs, hashtags) remains in standard plain text.\n\nOUTPUT STRUCTURE - VISUAL POST:\n- Headline (Hook): Bolded entirely. Max 10 words.\n- The Problem (1 sentence): Plain text.\n- The Core Framework (3 bullet points): Each bullet starts with 1-2 bolded words (the action verb or key term), followed by plain text explanation.\n- The Actionable Takeaway (1 sentence): Bolded entirely.\n- Call to Action: Plain text.\n- Related Hashtags: Plain text. Maximum 5. Mix broad and niche tags. No spaces or special characters. Format as a single line separated by spaces.\n\nREVISION SUMMARY (ONLY include if \"Reviewer Feedback\" is not empty):\nAfter the visual post, include a brief summary of the changes made based on feedback. This helps the reviewer confirm their feedback was incorporated.\n\nGENERATION NOTE (ONLY include if \"Reviewer Feedback\" is empty):\nDo not include any revision summary or feedback notes. Output only the visual post.\n\nSeed Idea: {{ $('Airtable Trigger').item.json.fields['Seed Idea'] }}\n\nContext: {{ $('Airtable Trigger').item.json.fields.Context }}\n\nReviewer Feedback: {{ $json.fields['Comments For Review'] }}",
+              "type": "string"
+            },
+            {
+              "id": "9de5b69e-61e2-4bba-a5a6-bde50cec96bb",
+              "name": "fields['Seed Idea']",
+              "value": "={{ $('Airtable Trigger').item.json.fields['Seed Idea'] }}",
+              "type": "string"
+            },
+            {
+              "id": "1757b556-1d0d-4425-b1a2-dfc770eeec74",
+              "name": "fields.Context",
+              "value": "={{ $('Airtable Trigger').item.json.fields.Context }}",
+              "type": "string"
+            },
+            {
+              "id": "bfc3df49-5b55-40fc-b87e-5501dfb7e534",
+              "name": "fields['Comments For Review']",
+              "value": "={{ $json.fields['Comments For Review'] }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        544,
+        80
+      ],
+      "id": "bed28bf2-c05d-4d2a-a81a-475a3870fd75",
+      "name": "Prepare For AI Node With Feedback"
+    },
+    {
+      "parameters": {
+        "authentication": "airtableOAuth2Api",
+        "operation": "create",
+        "base": {
+          "__rl": true,
+          "value": "app9ayaylrWBYzGgl",
+          "mode": "list",
+          "cachedResultName": "Content Pipeline",
+          "cachedResultUrl": "https://airtable.com/app9ayaylrWBYzGgl"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblvQCFahExTBXb4i",
+          "mode": "list",
+          "cachedResultName": "Workflow Log",
+          "cachedResultUrl": "https://airtable.com/app9ayaylrWBYzGgl/tblvQCFahExTBXb4i"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Workflow": "={{ $workflow.name }}",
+            "Post ID": "={{ $('Airtable Trigger').item.json.id }}",
+            "State": "Error",
+            "Node": "Basic LLM Chain",
+            "Seed Idea": "={{ $('Airtable Trigger').item.json.fields['Seed Idea'] }}",
+            "Context": "={{ $('Airtable Trigger').item.json.fields.Context }}",
+            "Record ID": "={{ $('Airtable Trigger').item.json.fields.ID }}",
+            "Execution Date": "={{ $now }}",
+            "Error Message": "={{ $json.error }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Id",
+              "displayName": "Id",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "Workflow",
+              "displayName": "Workflow",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Post ID",
+              "displayName": "Post ID",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "State",
+              "displayName": "State",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "Draft",
+                  "value": "Draft"
+                },
+                {
+                  "name": "Awaiting Approval",
+                  "value": "Awaiting Approval"
+                },
+                {
+                  "name": "Re-Generating Post",
+                  "value": "Re-Generating Post"
+                },
+                {
+                  "name": "Approved",
+                  "value": "Approved"
+                },
+                {
+                  "name": "Rejected",
+                  "value": "Rejected"
+                },
+                {
+                  "name": "Published",
+                  "value": "Published"
+                },
+                {
+                  "name": "Error",
+                  "value": "Error"
+                }
+              ],
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Error Message",
+              "displayName": "Error Message",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Node",
+              "displayName": "Node",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Seed Idea",
+              "displayName": "Seed Idea",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Context",
+              "displayName": "Context",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Content Category",
+              "displayName": "Content Category",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "Tips",
+                  "value": "Tips"
+                },
+                {
+                  "name": "How-To",
+                  "value": "How-To"
+                },
+                {
+                  "name": "Case Study",
+                  "value": "Case Study"
+                },
+                {
+                  "name": "Industry News",
+                  "value": "Industry News"
+                },
+                {
+                  "name": "Opinion",
+                  "value": "Opinion"
+                },
+                {
+                  "name": "Announcement",
+                  "value": "Announcement"
+                },
+                {
+                  "name": "Other",
+                  "value": "Other"
+                }
+              ],
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Reviewer Feedback",
+              "displayName": "Reviewer Feedback",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Revision Count",
+              "displayName": "Revision Count",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Published Date",
+              "displayName": "Published Date",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "dateTime",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Post Content",
+              "displayName": "Post Content",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Record ID",
+              "displayName": "Record ID",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Execution Date",
+              "displayName": "Execution Date",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "dateTime",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.2,
+      "position": [
+        -784,
+        32
+      ],
+      "id": "f8bda637-203d-447a-b5fe-2c6710e58501",
+      "name": "WF Log - LLM Error",
+      "credentials": {
+        "airtableOAuth2Api": {
+          "id": "kLFMZzm9v88LLSZb",
+          "name": "Airtable account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "airtableOAuth2Api",
+        "operation": "update",
+        "base": {
+          "__rl": true,
+          "value": "app9ayaylrWBYzGgl",
+          "mode": "list",
+          "cachedResultName": "Content Pipeline",
+          "cachedResultUrl": "https://airtable.com/app9ayaylrWBYzGgl"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblvQCFahExTBXb4i",
+          "mode": "list",
+          "cachedResultName": "Workflow Log",
+          "cachedResultUrl": "https://airtable.com/app9ayaylrWBYzGgl/tblvQCFahExTBXb4i"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "id": "={{ $('WF Log - Basic LLM Chain').item.json.id }}",
+            "Revision Count": "={{ $('WF Log - Basic LLM Chain').item.json.fields['Revision Count'] + 1 }}",
+            "State": "Rejected",
+            "Node": "HITL - Rejected",
+            "Reviewer Feedback": "={{ $json.data.text }}",
+            "Execution Date": "={{ $now }}"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": false
+            },
+            {
+              "id": "Id",
+              "displayName": "Id",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "Workflow",
+              "displayName": "Workflow",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Post ID",
+              "displayName": "Post ID",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "State",
+              "displayName": "State",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "Draft",
+                  "value": "Draft"
+                },
+                {
+                  "name": "Awaiting Approval",
+                  "value": "Awaiting Approval"
+                },
+                {
+                  "name": "Re-Generating Post",
+                  "value": "Re-Generating Post"
+                },
+                {
+                  "name": "Approved",
+                  "value": "Approved"
+                },
+                {
+                  "name": "Rejected",
+                  "value": "Rejected"
+                },
+                {
+                  "name": "Published",
+                  "value": "Published"
+                },
+                {
+                  "name": "Error",
+                  "value": "Error"
+                }
+              ],
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Error Message",
+              "displayName": "Error Message",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Node",
+              "displayName": "Node",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Seed Idea",
+              "displayName": "Seed Idea",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Context",
+              "displayName": "Context",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Content Category",
+              "displayName": "Content Category",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "Tips",
+                  "value": "Tips"
+                },
+                {
+                  "name": "How-To",
+                  "value": "How-To"
+                },
+                {
+                  "name": "Case Study",
+                  "value": "Case Study"
+                },
+                {
+                  "name": "Industry News",
+                  "value": "Industry News"
+                },
+                {
+                  "name": "Opinion",
+                  "value": "Opinion"
+                },
+                {
+                  "name": "Announcement",
+                  "value": "Announcement"
+                },
+                {
+                  "name": "Other",
+                  "value": "Other"
+                }
+              ],
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Reviewer Feedback",
+              "displayName": "Reviewer Feedback",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Revision Count",
+              "displayName": "Revision Count",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Published Date",
+              "displayName": "Published Date",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "dateTime",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Post Content",
+              "displayName": "Post Content",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Record ID",
+              "displayName": "Record ID",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Execution Date",
+              "displayName": "Execution Date",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "dateTime",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.2,
+      "position": [
+        112,
+        80
+      ],
+      "id": "20767a05-3a71-4203-a193-3a0c08226e86",
+      "name": "WF Log - HITL Rejected",
+      "credentials": {
+        "airtableOAuth2Api": {
+          "id": "kLFMZzm9v88LLSZb",
+          "name": "Airtable account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "airtableOAuth2Api",
+        "operation": "create",
+        "base": {
+          "__rl": true,
+          "value": "app9ayaylrWBYzGgl",
+          "mode": "list",
+          "cachedResultName": "Content Pipeline",
+          "cachedResultUrl": "https://airtable.com/app9ayaylrWBYzGgl"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblvQCFahExTBXb4i",
+          "mode": "list",
+          "cachedResultName": "Workflow Log",
+          "cachedResultUrl": "https://airtable.com/app9ayaylrWBYzGgl/tblvQCFahExTBXb4i"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Workflow": "={{ $workflow.name }}",
+            "Post ID": "={{ $json.id }}",
+            "State": "Draft",
+            "Node": "Airtable Trigger",
+            "Seed Idea": "={{ $json.fields['Seed Idea'] }}",
+            "Context": "={{ $json.fields.Context }}",
+            "Record ID": "={{ $json.fields.ID }}",
+            "Execution Date": "={{ $now }}",
+            "Revision Count": 0
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Id",
+              "displayName": "Id",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "Workflow",
+              "displayName": "Workflow",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Post ID",
+              "displayName": "Post ID",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "State",
+              "displayName": "State",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "Draft",
+                  "value": "Draft"
+                },
+                {
+                  "name": "Awaiting Approval",
+                  "value": "Awaiting Approval"
+                },
+                {
+                  "name": "Re-Generating Post",
+                  "value": "Re-Generating Post"
+                },
+                {
+                  "name": "Approved",
+                  "value": "Approved"
+                },
+                {
+                  "name": "Rejected",
+                  "value": "Rejected"
+                },
+                {
+                  "name": "Published",
+                  "value": "Published"
+                },
+                {
+                  "name": "Error",
+                  "value": "Error"
+                }
+              ],
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Error Message",
+              "displayName": "Error Message",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Node",
+              "displayName": "Node",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Seed Idea",
+              "displayName": "Seed Idea",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Context",
+              "displayName": "Context",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Content Category",
+              "displayName": "Content Category",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "Tips",
+                  "value": "Tips"
+                },
+                {
+                  "name": "How-To",
+                  "value": "How-To"
+                },
+                {
+                  "name": "Case Study",
+                  "value": "Case Study"
+                },
+                {
+                  "name": "Industry News",
+                  "value": "Industry News"
+                },
+                {
+                  "name": "Opinion",
+                  "value": "Opinion"
+                },
+                {
+                  "name": "Announcement",
+                  "value": "Announcement"
+                },
+                {
+                  "name": "Other",
+                  "value": "Other"
+                }
+              ],
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Reviewer Feedback",
+              "displayName": "Reviewer Feedback",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Revision Count",
+              "displayName": "Revision Count",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Published Date",
+              "displayName": "Published Date",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "dateTime",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Post Content",
+              "displayName": "Post Content",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Record ID",
+              "displayName": "Record ID",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Execution Date",
+              "displayName": "Execution Date",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "dateTime",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.2,
+      "position": [
+        -1760,
+        -64
+      ],
+      "id": "116be8e0-ee28-4749-a2f3-0c1d673fa731",
+      "name": "WF Log - Airtable Trigger",
+      "credentials": {
+        "airtableOAuth2Api": {
+          "id": "kLFMZzm9v88LLSZb",
+          "name": "Airtable account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "airtableOAuth2Api",
+        "operation": "update",
+        "base": {
+          "__rl": true,
+          "value": "app9ayaylrWBYzGgl",
+          "mode": "list",
+          "cachedResultName": "Content Pipeline",
+          "cachedResultUrl": "https://airtable.com/app9ayaylrWBYzGgl"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblvQCFahExTBXb4i",
+          "mode": "list",
+          "cachedResultName": "Workflow Log",
+          "cachedResultUrl": "https://airtable.com/app9ayaylrWBYzGgl/tblvQCFahExTBXb4i"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "id": "={{ $('WF Log - Airtable Trigger').item.json.id }}",
+            "Node": "Basic LLM Chain",
+            "Post Content": "={{ $('Basic LLM Chain').item.json.text }}",
+            "Execution Date": "={{ $now }}"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": false
+            },
+            {
+              "id": "Id",
+              "displayName": "Id",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "Workflow",
+              "displayName": "Workflow",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Post ID",
+              "displayName": "Post ID",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "State",
+              "displayName": "State",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "Draft",
+                  "value": "Draft"
+                },
+                {
+                  "name": "Awaiting Approval",
+                  "value": "Awaiting Approval"
+                },
+                {
+                  "name": "Re-Generating Post",
+                  "value": "Re-Generating Post"
+                },
+                {
+                  "name": "Approved",
+                  "value": "Approved"
+                },
+                {
+                  "name": "Rejected",
+                  "value": "Rejected"
+                },
+                {
+                  "name": "Published",
+                  "value": "Published"
+                },
+                {
+                  "name": "Error",
+                  "value": "Error"
+                }
+              ],
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Error Message",
+              "displayName": "Error Message",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Node",
+              "displayName": "Node",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Seed Idea",
+              "displayName": "Seed Idea",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Context",
+              "displayName": "Context",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Content Category",
+              "displayName": "Content Category",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "Tips",
+                  "value": "Tips"
+                },
+                {
+                  "name": "How-To",
+                  "value": "How-To"
+                },
+                {
+                  "name": "Case Study",
+                  "value": "Case Study"
+                },
+                {
+                  "name": "Industry News",
+                  "value": "Industry News"
+                },
+                {
+                  "name": "Opinion",
+                  "value": "Opinion"
+                },
+                {
+                  "name": "Announcement",
+                  "value": "Announcement"
+                },
+                {
+                  "name": "Other",
+                  "value": "Other"
+                }
+              ],
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Reviewer Feedback",
+              "displayName": "Reviewer Feedback",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Revision Count",
+              "displayName": "Revision Count",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Published Date",
+              "displayName": "Published Date",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "dateTime",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Post Content",
+              "displayName": "Post Content",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Record ID",
+              "displayName": "Record ID",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Execution Date",
+              "displayName": "Execution Date",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "dateTime",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.2,
+      "position": [
+        -784,
+        -160
+      ],
+      "id": "b106c44a-dbf9-4c26-9c58-deb5360a19cf",
+      "name": "WF Log - Basic LLM Chain",
+      "credentials": {
+        "airtableOAuth2Api": {
+          "id": "kLFMZzm9v88LLSZb",
+          "name": "Airtable account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "airtableOAuth2Api",
+        "operation": "update",
+        "base": {
+          "__rl": true,
+          "value": "app9ayaylrWBYzGgl",
+          "mode": "list",
+          "cachedResultName": "Content Pipeline",
+          "cachedResultUrl": "https://airtable.com/app9ayaylrWBYzGgl"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblvQCFahExTBXb4i",
+          "mode": "list",
+          "cachedResultName": "Workflow Log",
+          "cachedResultUrl": "https://airtable.com/app9ayaylrWBYzGgl/tblvQCFahExTBXb4i"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "id": "={{ $('WF Log - Basic LLM Chain').item.json.id }}",
+            "State": "Approved",
+            "Node": "HITL Approved",
+            "Execution Date": "={{ $now }}"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": false
+            },
+            {
+              "id": "Id",
+              "displayName": "Id",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "Workflow",
+              "displayName": "Workflow",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Post ID",
+              "displayName": "Post ID",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "State",
+              "displayName": "State",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "Draft",
+                  "value": "Draft"
+                },
+                {
+                  "name": "Awaiting Approval",
+                  "value": "Awaiting Approval"
+                },
+                {
+                  "name": "Re-Generating Post",
+                  "value": "Re-Generating Post"
+                },
+                {
+                  "name": "Approved",
+                  "value": "Approved"
+                },
+                {
+                  "name": "Rejected",
+                  "value": "Rejected"
+                },
+                {
+                  "name": "Published",
+                  "value": "Published"
+                },
+                {
+                  "name": "Error",
+                  "value": "Error"
+                }
+              ],
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Error Message",
+              "displayName": "Error Message",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Node",
+              "displayName": "Node",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Seed Idea",
+              "displayName": "Seed Idea",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Context",
+              "displayName": "Context",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Content Category",
+              "displayName": "Content Category",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "Tips",
+                  "value": "Tips"
+                },
+                {
+                  "name": "How-To",
+                  "value": "How-To"
+                },
+                {
+                  "name": "Case Study",
+                  "value": "Case Study"
+                },
+                {
+                  "name": "Industry News",
+                  "value": "Industry News"
+                },
+                {
+                  "name": "Opinion",
+                  "value": "Opinion"
+                },
+                {
+                  "name": "Announcement",
+                  "value": "Announcement"
+                },
+                {
+                  "name": "Other",
+                  "value": "Other"
+                }
+              ],
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Reviewer Feedback",
+              "displayName": "Reviewer Feedback",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Revision Count",
+              "displayName": "Revision Count",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Published Date",
+              "displayName": "Published Date",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "dateTime",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Post Content",
+              "displayName": "Post Content",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Record ID",
+              "displayName": "Record ID",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Execution Date",
+              "displayName": "Execution Date",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "dateTime",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.2,
+      "position": [
+        112,
+        -176
+      ],
+      "id": "bb647e7d-4dc7-49c4-a0cf-888fbd64da40",
+      "name": "WF Log - HITL Approved",
+      "credentials": {
+        "airtableOAuth2Api": {
+          "id": "kLFMZzm9v88LLSZb",
+          "name": "Airtable account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "airtableOAuth2Api",
+        "operation": "update",
+        "base": {
+          "__rl": true,
+          "value": "app9ayaylrWBYzGgl",
+          "mode": "list",
+          "cachedResultName": "Content Pipeline",
+          "cachedResultUrl": "https://airtable.com/app9ayaylrWBYzGgl"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblvQCFahExTBXb4i",
+          "mode": "list",
+          "cachedResultName": "Workflow Log",
+          "cachedResultUrl": "https://airtable.com/app9ayaylrWBYzGgl/tblvQCFahExTBXb4i"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "id": "={{ $('WF Log - Basic LLM Chain').item.json.id }}",
+            "State": "Published",
+            "Node": "Publish Post",
+            "Published Date": "={{ $now }}",
+            "Execution Date": "={{ $now }}"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": false
+            },
+            {
+              "id": "Id",
+              "displayName": "Id",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            },
+            {
+              "id": "Workflow",
+              "displayName": "Workflow",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Post ID",
+              "displayName": "Post ID",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "State",
+              "displayName": "State",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "Draft",
+                  "value": "Draft"
+                },
+                {
+                  "name": "Awaiting Approval",
+                  "value": "Awaiting Approval"
+                },
+                {
+                  "name": "Re-Generating Post",
+                  "value": "Re-Generating Post"
+                },
+                {
+                  "name": "Approved",
+                  "value": "Approved"
+                },
+                {
+                  "name": "Rejected",
+                  "value": "Rejected"
+                },
+                {
+                  "name": "Published",
+                  "value": "Published"
+                },
+                {
+                  "name": "Error",
+                  "value": "Error"
+                }
+              ],
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Error Message",
+              "displayName": "Error Message",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Node",
+              "displayName": "Node",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Seed Idea",
+              "displayName": "Seed Idea",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Context",
+              "displayName": "Context",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Reviewer Feedback",
+              "displayName": "Reviewer Feedback",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Revision Count",
+              "displayName": "Revision Count",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Published Date",
+              "displayName": "Published Date",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "dateTime",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Post Content",
+              "displayName": "Post Content",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Record ID",
+              "displayName": "Record ID",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Execution Date",
+              "displayName": "Execution Date",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "dateTime",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.2,
+      "position": [
+        752,
+        -176
+      ],
+      "id": "f565539c-3a11-4f5e-9cda-83fa0cfd9690",
+      "name": "WF Log - Publish Post",
+      "credentials": {
+        "airtableOAuth2Api": {
+          "id": "kLFMZzm9v88LLSZb",
+          "name": "Airtable account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Airtable Trigger": {
+      "main": [
+        [
+          {
+            "node": "WF Log - Airtable Trigger",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "DeepSeek Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Basic LLM Chain": {
+      "main": [
+        [
+          {
+            "node": "WF Log - Basic LLM Chain",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "WF Log - LLM Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update State = Processed By AI": {
+      "main": [
+        [
+          {
+            "node": "HITL - Send Post For Human Approval",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HITL - Send Post For Human Approval": {
+      "main": [
+        [
+          {
+            "node": "IF - Approved By Human Reviewer?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update State = Approved & Approved By Human = True": {
+      "main": [
+        [
+          {
+            "node": "Publish Post",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Publish Post": {
+      "main": [
+        [
+          {
+            "node": "WF Log - Publish Post",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update State = Published": {
+      "main": [
+        [
+          {
+            "node": "Send Message Of Post Published",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter": {
+      "main": [
+        [
+          {
+            "node": "Prepare For AI Node",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF - Approved By Human Reviewer?": {
+      "main": [
+        [
+          {
+            "node": "WF Log - HITL Approved",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "WF Log - HITL Rejected",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update State = Generating & Comments For Review": {
+      "main": [
+        [
+          {
+            "node": "Prepare For AI Node With Feedback",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update State = Error & Log Error Message": {
+      "main": [
+        [
+          {
+            "node": "Error - Send Message To Support Team",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare For AI Node": {
+      "main": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare For AI Node With Feedback": {
+      "main": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Message Of Post Published": {
+      "main": [
+        []
+      ]
+    },
+    "WF Log - LLM Error": {
+      "main": [
+        [
+          {
+            "node": "Update State = Error & Log Error Message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "WF Log - HITL Rejected": {
+      "main": [
+        [
+          {
+            "node": "Update State = Generating & Comments For Review",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "WF Log - Airtable Trigger": {
+      "main": [
+        [
+          {
+            "node": "Filter",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "WF Log - Basic LLM Chain": {
+      "main": [
+        [
+          {
+            "node": "Update State = Processed By AI",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "WF Log - HITL Approved": {
+      "main": [
+        [
+          {
+            "node": "Update State = Approved & Approved By Human = True",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "WF Log - Publish Post": {
+      "main": [
+        [
+          {
+            "node": "Update State = Published",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false,
+    "timeSavedMode": "fixed",
+    "errorWorkflow": "gmYFV8bJt2YzxLdi",
+    "timezone": "America/Argentina/Buenos_Aires",
+    "callerPolicy": "workflowsFromSameOwner",
+    "executionTimeout": 180
+  },
+  "versionId": "35cd8fa3-aa12-4966-ac01-6dd1995f7312",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "65172a90afdd3282c0fc5e98c70456bffcc077f952facf91f9ff51d735fd89d8"
+  },
+  "nodeGroups": [],
+  "id": "6TZPD8IsedLCrHJH",
+  "tags": []
+}

@@ -1,0 +1,300 @@
+{
+  "version": "31.4.0",
+  "pages": [
+    {
+      "id": "blBDF3F0GfE-jokBptqM",
+      "name": "Page-1",
+      "cells": [
+        {
+          "id": "1",
+          "type": "layer"
+        },
+        {
+          "id": "lkxn-wZv6XQ3b0gzX5p_-2",
+          "type": "node",
+          "parent": "1",
+          "label": "GENERACIÓN DE CONTENIDO AUTÓNOMO\nCON HITL + MANEJO DE ERRORES",
+          "html": "GENERACIÓN DE CONTENIDO AUTÓNOMO<div>CON HITL&nbsp;<span style=\"background-color: transparent; color: light-dark(rgb(26, 26, 46), rgb(213, 213, 230));\">+ MANEJO DE ERRORES</span></div>"
+        },
+        {
+          "id": "lkxn-wZv6XQ3b0gzX5p_-7",
+          "type": "edge",
+          "parent": "1",
+          "source": "lkxn-wZv6XQ3b0gzX5p_-4",
+          "target": "lkxn-wZv6XQ3b0gzX5p_-6"
+        },
+        {
+          "id": "lkxn-wZv6XQ3b0gzX5p_-9",
+          "type": "edge",
+          "parent": "1",
+          "source": "lkxn-wZv6XQ3b0gzX5p_-4",
+          "target": "lkxn-wZv6XQ3b0gzX5p_-8"
+        },
+        {
+          "id": "lkxn-wZv6XQ3b0gzX5p_-4",
+          "type": "node",
+          "parent": "1",
+          "label": "NODO DE IA\n\nGeneración autónoma de contenido por la IA.",
+          "html": "<b>NODO DE IA</b><div><br><div>Generación autónoma de contenido por la IA.</div></div>"
+        },
+        {
+          "id": "lkxn-wZv6XQ3b0gzX5p_-35",
+          "type": "edge",
+          "parent": "1",
+          "source": "lkxn-wZv6XQ3b0gzX5p_-6",
+          "target": "lkxn-wZv6XQ3b0gzX5p_-33"
+        },
+        {
+          "id": "lkxn-wZv6XQ3b0gzX5p_-6",
+          "type": "node",
+          "parent": "1",
+          "label": "MANEJO DE ERRORES\n\n3 reintentos",
+          "html": "<b>MANEJO DE ERRORES</b><div><br></div><div>3 reintentos</div>"
+        },
+        {
+          "id": "lkxn-wZv6XQ3b0gzX5p_-19",
+          "type": "edge",
+          "parent": "1",
+          "source": "lkxn-wZv6XQ3b0gzX5p_-8",
+          "target": "lkxn-wZv6XQ3b0gzX5p_-18"
+        },
+        {
+          "id": "lkxn-wZv6XQ3b0gzX5p_-8",
+          "type": "node",
+          "parent": "1",
+          "label": "PAUSA HITL\n\nSe envía un mensaje por Slack al revisor, con la URL del contenido.",
+          "html": "<b>PAUSA HITL</b><div><br></div><div>Se envía un mensaje por Slack al revisor, con la URL del contenido.</div>"
+        },
+        {
+          "id": "lkxn-wZv6XQ3b0gzX5p_-12",
+          "type": "edge",
+          "parent": "1",
+          "source": "lkxn-wZv6XQ3b0gzX5p_-33",
+          "target": "lkxn-wZv6XQ3b0gzX5p_-8"
+        },
+        {
+          "id": "lkxn-wZv6XQ3b0gzX5p_-13",
+          "type": "node",
+          "parent": "1",
+          "label": "SI"
+        },
+        {
+          "id": "lkxn-wZv6XQ3b0gzX5p_-41",
+          "type": "edge",
+          "parent": "1",
+          "source": "lkxn-wZv6XQ3b0gzX5p_-14"
+        },
+        {
+          "id": "lkxn-wZv6XQ3b0gzX5p_-14",
+          "type": "node",
+          "parent": "1",
+          "label": "TRIGGER\n\nTabla de Airtable:\nEstado = Pendiente\n&\nSeed Idea != ''",
+          "html": "<b>TRIGGER</b><br><br><div><span style=\"background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));\">Tabla de Airtable:</span></div><div>Estado = <b><i>Pendiente</i></b></div><div>&amp;</div><div><b><i>Seed Idea</i></b> != ''</div>"
+        },
+        {
+          "id": "lkxn-wZv6XQ3b0gzX5p_-32",
+          "type": "edge",
+          "parent": "1",
+          "source": "lkxn-wZv6XQ3b0gzX5p_-15",
+          "target": "lkxn-wZv6XQ3b0gzX5p_-31"
+        },
+        {
+          "id": "lkxn-wZv6XQ3b0gzX5p_-15",
+          "type": "node",
+          "parent": "1",
+          "label": "LOG DEL ERROR\nLog del error en la tabla de Airtable.",
+          "html": "<div><b>LOG DEL ERROR</b></div><div><br></div>Log del error en la tabla de Airtable."
+        },
+        {
+          "id": "lkxn-wZv6XQ3b0gzX5p_-17",
+          "type": "node",
+          "parent": "1",
+          "label": "NO"
+        },
+        {
+          "id": "lkxn-wZv6XQ3b0gzX5p_-20",
+          "type": "edge",
+          "parent": "1",
+          "source": "lkxn-wZv6XQ3b0gzX5p_-18"
+        },
+        {
+          "id": "lkxn-wZv6XQ3b0gzX5p_-25",
+          "type": "edge",
+          "parent": "1",
+          "source": "lkxn-wZv6XQ3b0gzX5p_-18",
+          "target": "lkxn-wZv6XQ3b0gzX5p_-24"
+        },
+        {
+          "id": "lkxn-wZv6XQ3b0gzX5p_-18",
+          "type": "node",
+          "parent": "1",
+          "label": "¿Aprobado?"
+        },
+        {
+          "id": "lkxn-wZv6XQ3b0gzX5p_-21",
+          "type": "node",
+          "parent": "1",
+          "label": "NO"
+        },
+        {
+          "id": "lkxn-wZv6XQ3b0gzX5p_-22",
+          "type": "node",
+          "parent": "1",
+          "label": "La IA modifica el contenido siguiendo los lineamientos del comentario."
+        },
+        {
+          "id": "lkxn-wZv6XQ3b0gzX5p_-28",
+          "type": "edge",
+          "parent": "1",
+          "source": "lkxn-wZv6XQ3b0gzX5p_-24",
+          "target": "lkxn-wZv6XQ3b0gzX5p_-27"
+        },
+        {
+          "id": "lkxn-wZv6XQ3b0gzX5p_-24",
+          "type": "node",
+          "parent": "1",
+          "label": "APROBADO\n\nSe marca el checkbox de Aprobado en la tabla de Airtable.",
+          "html": "<b>APROBADO</b><br><div><br></div><div>Se marca el checkbox de <b><i>Aprobado</i></b>&nbsp;en la tabla de Airtable.</div>"
+        },
+        {
+          "id": "lkxn-wZv6XQ3b0gzX5p_-26",
+          "type": "node",
+          "parent": "1",
+          "label": "SI"
+        },
+        {
+          "id": "lkxn-wZv6XQ3b0gzX5p_-30",
+          "type": "edge",
+          "parent": "1",
+          "source": "lkxn-wZv6XQ3b0gzX5p_-27",
+          "target": "lkxn-wZv6XQ3b0gzX5p_-29"
+        },
+        {
+          "id": "lkxn-wZv6XQ3b0gzX5p_-27",
+          "type": "node",
+          "parent": "1",
+          "label": "PUBLICACION\n\nLa IA realiza la publicación en un canal general de Slack.",
+          "html": "<b>PUBLICACION</b><div><br></div><div>La IA realiza la publicación en un canal general de Slack.</div>"
+        },
+        {
+          "id": "lkxn-wZv6XQ3b0gzX5p_-29",
+          "type": "node",
+          "parent": "1",
+          "label": "FIN DEL PROCESO\n\nSe actualiza el estado a Publicado en la tabla de Airtable y se envía un mensaje por Slack al revisor.",
+          "html": "<b>FIN DEL PROCESO</b><br><br>Se actualiza el estado a <b><i>Publicado</i></b>&nbsp;en la tabla de Airtable y se envía un mensaje por Slack al revisor."
+        },
+        {
+          "id": "lkxn-wZv6XQ3b0gzX5p_-31",
+          "type": "node",
+          "parent": "1",
+          "label": "FIN DEL PROCESO\n\nSe envía un mensaje del error al grupo de soporte en Slack.",
+          "html": "<b>FIN DEL PROCESO</b><br><br>Se envía un mensaje del error al grupo de soporte en Slack."
+        },
+        {
+          "id": "lkxn-wZv6XQ3b0gzX5p_-36",
+          "type": "edge",
+          "parent": "1",
+          "source": "lkxn-wZv6XQ3b0gzX5p_-33",
+          "target": "lkxn-wZv6XQ3b0gzX5p_-15"
+        },
+        {
+          "id": "lkxn-wZv6XQ3b0gzX5p_-33",
+          "type": "node",
+          "parent": "1"
+        },
+        {
+          "id": "lkxn-wZv6XQ3b0gzX5p_-34",
+          "type": "node",
+          "parent": "1",
+          "label": "¿Recuperación exitosa?"
+        },
+        {
+          "id": "lkxn-wZv6XQ3b0gzX5p_-52",
+          "type": "edge",
+          "parent": "1",
+          "source": "lkxn-wZv6XQ3b0gzX5p_-51",
+          "target": "lkxn-wZv6XQ3b0gzX5p_-4"
+        },
+        {
+          "id": "lkxn-wZv6XQ3b0gzX5p_-51",
+          "type": "node",
+          "parent": "1",
+          "label": "FILTRO\n\nState = Pending\n&\nSeed Idea != ''",
+          "html": "<b>FILTRO</b><br><div><br></div><div>State = Pending</div><div>&amp;</div><div>Seed Idea != ''</div>"
+        },
+        {
+          "id": "lkxn-wZv6XQ3b0gzX5p_-53",
+          "type": "node",
+          "parent": "1",
+          "label": "TRIGGER / DISPARADOR"
+        },
+        {
+          "id": "lkxn-wZv6XQ3b0gzX5p_-54",
+          "type": "node",
+          "parent": "1",
+          "label": "INPUT / ACCIÓN"
+        },
+        {
+          "id": "lkxn-wZv6XQ3b0gzX5p_-55",
+          "type": "node",
+          "parent": "1",
+          "label": "INPUT / ACCIÓN"
+        },
+        {
+          "id": "lkxn-wZv6XQ3b0gzX5p_-56",
+          "type": "node",
+          "parent": "1",
+          "label": "INPUT / ACCIÓN"
+        },
+        {
+          "id": "lkxn-wZv6XQ3b0gzX5p_-57",
+          "type": "node",
+          "parent": "1",
+          "label": "INPUT / ACCIÓN"
+        },
+        {
+          "id": "lkxn-wZv6XQ3b0gzX5p_-58",
+          "type": "node",
+          "parent": "1",
+          "label": "INPUT / ACCIÓN"
+        },
+        {
+          "id": "lkxn-wZv6XQ3b0gzX5p_-59",
+          "type": "node",
+          "parent": "1",
+          "label": "INPUT / ACCIÓN"
+        },
+        {
+          "id": "lkxn-wZv6XQ3b0gzX5p_-60",
+          "type": "node",
+          "parent": "1",
+          "label": "INPUT / ACCIÓN"
+        },
+        {
+          "id": "lkxn-wZv6XQ3b0gzX5p_-61",
+          "type": "node",
+          "parent": "1",
+          "label": "IF"
+        },
+        {
+          "id": "lkxn-wZv6XQ3b0gzX5p_-62",
+          "type": "node",
+          "parent": "1",
+          "label": "IF"
+        },
+        {
+          "id": "lkxn-wZv6XQ3b0gzX5p_-63",
+          "type": "node",
+          "parent": "1",
+          "label": "SALIDA"
+        },
+        {
+          "id": "lkxn-wZv6XQ3b0gzX5p_-64",
+          "type": "node",
+          "parent": "1",
+          "label": "SALIDA"
+        }
+      ]
+    }
+  ]
+}
